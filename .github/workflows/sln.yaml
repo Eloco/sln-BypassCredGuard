@@ -1,0 +1,33 @@
+name: sln comile
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    # 安装 .NET Core
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.202
+
+    # 添加 MSBuild.exe 到环境变量: https://github.com/microsoft/setup-msbuild
+    - name: Add msbuild to PATH
+      id: setup_msbuild_path
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: compile sln
+      run: |
+        #echo "PATH: ${{ steps.setup_msbuild_path.outputs.msbuildPath }}"
+        #dir
+        msbuild BypassCredGuard.sln /p:Configuration=Release
+    - uses: actions/upload-artifact@v3
+      with:
+        name: x64-compile
+        path: ${{ github.workspace }}\x64\Release # or path/to/artifact
